@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ctime>
+
 using namespace std;
 
 const size_t ALIGN = 32;
@@ -12,13 +13,13 @@ void easy_memcpy(void* dst, const void* src, size_t size) {
     }
     //slow asm :(
     /*for (size_t i = 0; i < size; ++i) {
-        __asm__ ("movb (%[src]), %%bl\n"
-                 "movb %%bl, (%[dst])\n"
-                 :
-                 :[src] "r"(src_ch + i), [dst] "r"(dst_ch + i)
-                 :"memory", "%bl"
-                 );
-    }*/
+     __asm__ ("movb (%[src]), %%bl\n"
+     "movb %%bl, (%[dst])\n"
+     :
+     :[src] "r"(src_ch + i), [dst] "r"(dst_ch + i)
+     :"memory", "%bl"
+     );
+     }*/
 }
 
 void smart_memcpy(void* dst, const void* src, size_t size) {
@@ -34,13 +35,15 @@ void smart_memcpy(void* dst, const void* src, size_t size) {
     size_t tail = (size - head) % ALIGN;
     char* dst_ch = (char*)dst;
     const char* src_ch = (const char*)src;
+    
     for (size_t i = head; i < size - tail; i += ALIGN) {
-        __asm__ ("vmovdqu (%[src]), %%ymm1\n"
-                 "vmovntdq %%ymm1, (%[dst])\n"
+        __asm__ ("vmovdqu (%[src], %[shift]), %%ymm1\n"
+                 "vmovntdq %%ymm1, (%[shift], %[dst])\n"
                  :
-                 :[src] "r"(src_ch + i), [dst] "r"(dst_ch + i)
+                 :[src] "r"(src_ch), [shift] "r"(i), [dst] "r"(dst_ch)
                  :"memory", "%ymm1");
     }
+    
     easy_memcpy((void*)(dst_ch + size - tail), (void*)(src_ch + size - tail), tail);
 }
 
@@ -57,6 +60,7 @@ int main() {
         }
         time = clock();
         //easy_memcpy(a, b, size);
+        //memcpy(a, b, size);
         smart_memcpy(a, b, size);
         cout << i << ": " << clock() - time;
         bool ok = true;

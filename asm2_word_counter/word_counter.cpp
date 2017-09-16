@@ -85,6 +85,7 @@ size_t smart_counter(const char* s, size_t size) {
             reg_bit &= reg_bit - 1;
             ++ans;
         }
+        //ans += __builtin_popcount(reg_bit);
     }
 
     return ans / 2;
