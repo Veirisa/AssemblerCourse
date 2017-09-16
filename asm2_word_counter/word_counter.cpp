@@ -42,7 +42,7 @@ size_t smart_counter(const char* s, size_t size) {
         head = 0;
     }
     result head_result = easy_counter_result(s, head);
-    size_t tail = ((size - head) % ALIGN) + 16;
+    size_t tail = ((size - head) % ALIGN) + ALIGN;
     result tail_result = easy_counter_result(s + size - tail, tail);
 
     size_t ans = 0;
