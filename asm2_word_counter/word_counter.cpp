@@ -4,7 +4,7 @@
 #include <ctime>
 using namespace std;
 
-size_t ALIGN = 16;
+const size_t ALIGN = 16;
 
 struct result {
     size_t ans;
